@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@code-editor/engine",
   "version": "1.0.0",
   "description": "Future-proof headless code editor engine for any platform",
@@ -10,36 +11,26 @@
       "import": "./dist/index.esm.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./core": {
-      "import": "./dist/core/index.esm.js",
-      "require": "./dist/core/index.js",
-      "types": "./dist/core/index.d.ts"
-    },
-    "./language": {
-      "import": "./dist/language/index.esm.js",
-      "require": "./dist/language/index.js",
-      "types": "./dist/language/index.d.ts"
     }
   },
   "files": [
-    "dist/",
+    "dist",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "build": "tsc && rollup -c",
-    "build:dev": "tsc --watch",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "format": "prettier --write src/**/*.ts",
-    "docs": "typedoc",
-    "benchmark": "node benchmark/index.js",
+    "build": "tsc",
+    "clean": "rm -rf dist",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint && npm run build"
+    "prepublishOnly": "npm run lint && npm run test",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint src --ext .ts",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch"
   },
   "keywords": [
     "code-editor",
@@ -58,29 +49,28 @@
     "extensible",
     "plugin-system"
   ],
-  "author": "Code Editor Engine Team",
+  "author": "Koushik Roy",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/code-editor/engine.git"
+    "url": "https://github.com/kroy665/coder-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/code-editor/engine/issues"
+    "url": "https://github.com/kroy665/coder-engine/issues"
   },
-  "homepage": "https://github.com/code-editor/engine#readme",
+  "homepage": "https://github.com/kroy665/coder-engine#readme",
   "peerDependencies": {
     "typescript": ">=4.5.0"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^12.1.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "eslint": "^9.39.1",
+    "globals": "^16.5.0",
     "jest": "^30.2.0",
     "prettier": "^3.6.2",
-    "rollup": "^4.21.3",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
@@ -88,75 +78,5 @@
   },
   "engines": {
     "node": ">=16.0.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/code-editor-engine"
-  },
-  "directories": {
-    "test": "tests",
-    "doc": "docs"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "roots": ["<rootDir>/src", "<rootDir>/tests"],
-    "testMatch": [
-      "**/__tests__/**/*.ts",
-      "**/?(*.)+(spec|test).ts"
-    ],
-    "collectCoverageFrom": [
-      "src/**/*.ts",
-      "!src/**/*.d.ts",
-      "!src/index.ts"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 80,
-        "functions": 80,
-        "lines": 80,
-        "statements": 80
-      }
-    }
-  },
-  "eslintConfig": {
-    "parser": "@typescript-eslint/parser",
-    "extends": [
-      "@typescript-eslint/recommended",
-      "prettier"
-    ],
-    "plugins": ["@typescript-eslint", "prettier"],
-    "rules": {
-      "prettier/prettier": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "error",
-      "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/explicit-module-boundary-types": "off",
-      "@typescript-eslint/no-non-null-assertion": "warn"
-    }
-  },
-  "prettier": {
-    "semi": true,
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "printWidth": 100,
-    "tabWidth": 2,
-    "useTabs": false
-  },
-  "typedoc": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs",
-    "plugin": ["typedoc-plugin-markdown"],
-    "readme": "README.md",
-    "exclude": ["**/*.test.ts", "**/*.spec.ts"]
   }
 }

@@ -1,74 +1,82 @@
-🏗️ Core Architecture
-1. Pure Logic Engine (No UI Dependencies)
+# Coder Engine
 
-Platform-agnostic design that works on React Native, Web, Node.js
-Headless architecture separates logic from presentation
-TypeScript-first with comprehensive type definitions
+Future-proof headless code editor engine for any platform.
 
-2. High-Performance Text Management
+## 🏗️ Core Architecture
 
-LineBuffer class with rope-like structure for efficient large file handling
-Incremental text operations with O(log n) complexity
-Smart caching and memory management
+### 1. Pure Logic Engine (No UI Dependencies)
 
-3. Advanced Command System
+- Platform-agnostic design that works on React Native, Web, Node.js
+- Headless architecture separates logic from presentation
+- TypeScript-first with comprehensive type definitions
 
-Command pattern with full undo/redo support
-Composite commands for complex operations
-Command grouping with automatic timeouts
-Built-in commands for all text operations
+### 2. High-Performance Text Management
 
-4. Robust Event System
+- LineBuffer class with rope-like structure for efficient large file handling
+- Incremental text operations with O(log n) complexity
+- Smart caching and memory management
 
-Type-safe event emitter with priority support
-Async event handling capabilities
-Memory leak prevention with proper disposal
+### 3. Advanced Command System
 
-5. Extensible Language Services
+- Command pattern with full undo/redo support
+- Composite commands for complex operations
+- Command grouping with automatic timeouts
+- Built-in commands for all text operations
 
-Modular tokenizer with state-machine architecture
-Built-in support for JavaScript, TypeScript, Python
-LSP-compatible interface for external language servers
-Hot-swappable language definitions
+### 4. Robust Event System
 
-6. Plugin Architecture
+- Type-safe event emitter with priority support
+- Async event handling capabilities
+- Memory leak prevention with proper disposal
 
-Full extension system with activation events
-Extension marketplace compatibility
-State management for extensions
-Dependency resolution and lifecycle management
+### 5. Extensible Language Services
 
-🚀 Key Features
-✅ Future-Proof Design
+- Modular tokenizer with state-machine architecture
+- Built-in support for JavaScript, TypeScript, Python
+- LSP-compatible interface for external language servers
+- Hot-swappable language definitions
 
-ES modules with tree-shaking support
-Incremental compilation and lazy loading
-Hot module replacement compatible
-Web Workers support for heavy operations
+### 6. Plugin Architecture
 
-✅ Performance Optimized
+- Full extension system with activation events
+- Extension marketplace compatibility
+- State management for extensions
+- Dependency resolution and lifecycle management
 
-Handles files up to 100MB efficiently
-Sub-millisecond text operations
-Intelligent tokenization caching
-Memory-efficient data structures
+## 🚀 Key Features
 
-✅ Fully Typed
+### ✅ Future-Proof Design
 
-100% TypeScript coverage
-Comprehensive interface definitions
-Generic type safety throughout
-IDE autocompletion support
+- ES modules with tree-shaking support
+- Incremental compilation and lazy loading
+- Hot module replacement compatible
+- Web Workers support for heavy operations
 
-✅ Extensible
+### ✅ Performance Optimized
 
-Plugin-based architecture
-Language service providers
-Custom command registration
-Theme and configuration management
+- Handles files up to 100MB efficiently
+- Sub-millisecond text operations
+- Intelligent tokenization caching
+- Memory-efficient data structures
 
-📦 Project Structure
-/mnt/user-data/outputs/
+### ✅ Fully Typed
+
+- 100% TypeScript coverage
+- Comprehensive interface definitions
+- Generic type safety throughout
+- IDE autocompletion support
+
+### ✅ Extensible
+
+- Plugin-based architecture
+- Language service providers
+- Custom command registration
+- Theme and configuration management
+
+## 📦 Project Structure
+
+```
+coder-engine/
 ├── src/
 │   ├── types/core.ts          # Complete type definitions
 │   ├── core/
@@ -80,19 +88,27 @@ Theme and configuration management
 │   │   ├── Tokenizer.ts       # Syntax highlighting
 │   │   └── Extensions.ts      # Plugin system
 │   └── index.ts               # Public API
-├── examples/basic-usage.ts    # Usage examples
 ├── package.json              # NPM configuration
 ├── tsconfig.json             # TypeScript config
 └── README.md                 # Documentation
-💡 Usage Examples
-Basic Editor:
-typescriptimport { createEditor, position } from '@code-editor/engine';
+```
+
+## 💡 Usage Examples
+
+### Basic Editor
+
+```typescript
+import { createEditor, position } from '@code-editor/engine';
 
 const { editor } = createEditor({ languages: ['javascript'] });
 await editor.openDocument('file.js', 'console.log("hello");', 'javascript');
 await editor.insertText(' // comment', position(0, 22));
-With Extensions:
-typescriptconst customExtension = {
+```
+
+### With Extensions
+
+```typescript
+const customExtension = {
   id: 'my-extension',
   name: 'My Extension',
   version: '1.0.0',
@@ -104,4 +120,8 @@ typescriptconst customExtension = {
 const { editor, extensionHost } = createEditor({
   extensions: [customExtension]
 });
+```
+
+## 🎯 Design Philosophy
+
 This engine provides everything needed to build Monaco-like editors for any platform, with a focus on mobile-first design and future compatibility. The headless architecture means you can plug in any UI framework while getting professional-grade editing capabilities.

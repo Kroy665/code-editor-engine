@@ -7,9 +7,9 @@ import {
     LanguageService,
     Disposable,
     CodeEditor,
-} from '../types/core.js';
-import { TypedEventEmitter, CompositeDisposable, DisposableImpl } from '../core/EventSystem.js';
-import { CodeEditorEngine } from '../core/CodeEditor.js';
+} from '../types/core';
+import { TypedEventEmitter, CompositeDisposable, DisposableImpl } from '../core/EventSystem';
+import { CodeEditorEngine } from '../core/CodeEditor';
 
 /**
  * Extension activation events
@@ -605,7 +605,7 @@ export class ExtensibleEditor {
 
     private static async loadBuiltInExtensions(extensionHost: ExtensionHost): Promise<void> {
         // Load built-in language extensions
-        const { TokenizerLanguageService } = require('./Tokenizer.js');
+        const { TokenizerLanguageService } = require('./Tokenizer');
 
         const jsExtension = BuiltInExtensions.createLanguageExtension(
             'javascript',

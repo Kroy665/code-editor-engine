@@ -1,5 +1,5 @@
-import { Command, CommandContext, Disposable, Position, Range } from '../types/core.js';
-import { TypedEventEmitter, DisposableImpl } from './EventSystem.js';
+import { Command, CommandContext, Disposable, Position, Range } from '../types/core';
+import { TypedEventEmitter, DisposableImpl } from './EventSystem';
 
 /**
  * Base implementation for undoable commands

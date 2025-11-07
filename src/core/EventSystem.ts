@@ -1,4 +1,4 @@
-import { EventEmitter, EventListener, Disposable } from '../types/core.js';
+import { EventEmitter, EventListener, Disposable } from '../types/core';
 
 /**
  * Disposable implementation for cleanup

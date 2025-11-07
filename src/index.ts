@@ -14,12 +14,12 @@
 // ================================
 // CORE TYPES
 // ================================
-export * from './types/core.js';
+export * from './types/core';
 
 // ================================
 // CORE ENGINE
 // ================================
-export { LineBuffer, TextDocumentImpl } from './core/TextDocument.js';
+export { LineBuffer, TextDocumentImpl } from './core/TextDocument';
 
 export {
     TypedEventEmitter,
@@ -29,7 +29,7 @@ export {
     CompositeDisposable,
     combineDisposables,
     createDisposable,
-} from './core/EventSystem.js';
+} from './core/EventSystem';
 
 export {
     UndoableCommand,
@@ -39,14 +39,14 @@ export {
     CommandHistory,
     CommandGrouper,
     BuiltInCommands,
-} from './core/CommandSystem.js';
+} from './core/CommandSystem';
 
-export { CodeEditorEngine, createCodeEditor, EditorBuilder, editor } from './core/CodeEditor.js';
+export { CodeEditorEngine, createCodeEditor, EditorBuilder, editor } from './core/CodeEditor';
 
 // ================================
 // LANGUAGE SERVICES
 // ================================
-export { Tokenizer, TokenizerLanguageService, BuiltInLanguages } from './language/Tokenizer.js';
+export { Tokenizer, TokenizerLanguageService, BuiltInLanguages } from './language/Tokenizer';
 
 export type {
     EnhancedToken,
@@ -55,7 +55,7 @@ export type {
     BracketDefinition,
     CommentDefinition,
     StringDefinition,
-} from './language/Tokenizer.js';
+} from './language/Tokenizer';
 
 // ================================
 // EXTENSION SYSTEM
@@ -66,7 +66,7 @@ export {
     BuiltInExtensions,
     ExtensibleEditor,
     ActivationEvent,
-} from './language/Extensions.js';
+} from './language/Extensions';
 
 export type {
     ExtensionManifest,
@@ -86,7 +86,7 @@ export type {
     ExtensionMarketplace,
     SearchOptions,
     ExtensionSearchResult,
-} from './language/Extensions.js';
+} from './language/Extensions';
 
 // ================================
 // UTILITY FUNCTIONS
@@ -98,16 +98,16 @@ export type {
 export function createEditor(
     options: {
         /** Editor configuration options */
-        editorOptions?: Partial<import('./types/core.js').EditorOptions>;
+        editorOptions?: Partial<import('./types/core').EditorOptions>;
         /** Language IDs to enable */
         languages?: string[];
         /** Custom extensions to load */
-        extensions?: import('./types/core.js').Extension[];
+        extensions?: import('./types/core').Extension[];
         /** Whether to load built-in extensions */
         builtInExtensions?: boolean;
     } = {},
 ) {
-    const { ExtensibleEditor } = require('./language/Extensions.js');
+    const { ExtensibleEditor } = require('./language/Extensions');
     const { editor, extensionHost } = ExtensibleEditor.create({
         editorOptions: options.editorOptions,
         extensions: options.extensions,
@@ -127,15 +127,15 @@ export function createEditor(
 /**
  * Create a minimal editor instance without extensions
  */
-export function createMinimalEditor(options?: Partial<import('./types/core.js').EditorOptions>) {
-    const { CodeEditorEngine } = require('./core/CodeEditor.js');
+export function createMinimalEditor(options?: Partial<import('./types/core').EditorOptions>) {
+    const { CodeEditorEngine } = require('./core/CodeEditor');
     return new CodeEditorEngine(options);
 }
 
 /**
  * Utility to create a position
  */
-export function position(line: number, column: number): import('./types/core.js').Position {
+export function position(line: number, column: number): import('./types/core').Position {
     return { line, column };
 }
 
@@ -147,7 +147,7 @@ export function range(
     startColumn: number,
     endLine: number,
     endColumn: number,
-): import('./types/core.js').Range {
+): import('./types/core').Range {
     return {
         start: { line: startLine, column: startColumn },
         end: { line: endLine, column: endColumn },
@@ -162,7 +162,7 @@ export function selection(
     anchorColumn: number,
     activeLine: number,
     activeColumn: number,
-): import('./types/core.js').Selection {
+): import('./types/core').Selection {
     const anchor = { line: anchorLine, column: anchorColumn };
     const active = { line: activeLine, column: activeColumn };
     const isReversed =

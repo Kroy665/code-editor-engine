@@ -39,4 +39,37 @@ export default [
       'no-useless-escape': 'warn',
     },
   },
+  {
+    files: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+        ...globals.jest,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': tsPlugin,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...tsPlugin.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-require-imports': 'warn',
+      'no-console': 'warn',
+      'no-useless-escape': 'warn',
+    },
+  },
 ];

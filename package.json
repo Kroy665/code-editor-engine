@@ -26,7 +26,6 @@
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint src --ext .ts",
     "test": "jest --passWithNoTests",
@@ -53,12 +52,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kroy665/coder-engine.git"
+    "url": "https://github.com/Kroy665/code-editor-engine.git"
   },
   "bugs": {
-    "url": "https://github.com/kroy665/coder-engine/issues"
+    "url": "https://github.com/Kroy665/code-editor-engine/issues"
   },
-  "homepage": "https://github.com/kroy665/coder-engine#readme",
+  "homepage": "https://github.com/Kroy665/code-editor-engine#readme",
   "peerDependencies": {
     "typescript": ">=4.5.0"
   },

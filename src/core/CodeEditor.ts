@@ -9,15 +9,10 @@ import {
     Command,
     LanguageService,
     Disposable,
-} from '../types/core.js';
-import { TextDocumentImpl } from './TextDocument.js';
-import { TypedEventEmitter, CompositeDisposable, DisposableImpl } from './EventSystem.js';
-import {
-    CommandRegistry,
-    CommandHistory,
-    UndoableCommand,
-    BuiltInCommands,
-} from './CommandSystem.js';
+} from '../types/core';
+import { TextDocumentImpl } from './TextDocument';
+import { TypedEventEmitter, CompositeDisposable, DisposableImpl } from './EventSystem';
+import { CommandRegistry, CommandHistory, UndoableCommand, BuiltInCommands } from './CommandSystem';
 
 /**
  * Default editor options

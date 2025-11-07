@@ -1,4 +1,4 @@
-import { Position, Range, TextDocument } from '../types/core.js';
+import { Position, Range, TextDocument } from '../types/core';
 
 /**
  * Efficient line-based text representation using a rope-like structure

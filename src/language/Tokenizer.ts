@@ -1,4 +1,4 @@
-import { Token, TokenType, Range, TextDocument, LanguageService } from '../types/core.js';
+import { Token, TokenType, Range, TextDocument, LanguageService } from '../types/core';
 
 /**
  * Token with additional metadata for highlighting

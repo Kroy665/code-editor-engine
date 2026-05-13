@@ -1,5 +1,5 @@
 {
-  "name": "@code-editor/engine",
+  "name": "@kroy665/code-editor-engine",
   "version": "1.0.0",
   "description": "Future-proof headless code editor engine for any platform",
   "main": "dist/index.js",

@@ -57,6 +57,16 @@ Perfect for building Monaco-like editors for web, React Native, mobile apps, des
 - Formatting
 - Rename operations
 
+### 🎯 **Bracket Matching & Auto-Closing**
+- Find matching brackets (forward and backward)
+- Nested bracket detection
+- Surrounding bracket detection
+- Auto-close brackets: `()`, `[]`, `{}`
+- Auto-close quotes: `"`, `'`, `` ` ``
+- Smart skip-over closing characters
+- Customizable bracket pairs
+- Context-aware auto-closing
+
 ## 📦 Installation
 
 ```bash
@@ -184,6 +194,53 @@ editor.on('selection-changed', ({ selections }) => {
 });
 
 await editor.openDocument('file:///example.js', 'let x = 1;', 'javascript');
+```
+
+### Bracket Matching & Auto-Closing
+
+```typescript
+import { createEditor, position } from '@kroy665/code-editor-engine';
+
+const { editor } = createEditor();
+await editor.openDocument('file:///example.js', '', 'javascript');
+
+// Auto-closing brackets
+await editor.insertText('(');
+console.log(editor.document?.getText()); // Output: "()"
+// Cursor is automatically positioned between the brackets
+
+// Skip over closing brackets
+await editor.insertText(')');
+// Cursor moves past the closing bracket instead of inserting another one
+
+// Find matching bracket
+await editor.openDocument(
+  'file:///example.js',
+  'function test() { return true; }',
+  'javascript'
+);
+
+const match = editor.findMatchingBracket(position(0, 16)); // Position of opening {
+console.log(match?.close.start); // Position of closing }
+
+// Find surrounding brackets
+const surrounding = editor.findSurroundingBrackets(position(0, 25));
+console.log(surrounding); // Returns the innermost bracket pair containing the position
+
+// Check if inside brackets
+const isInside = editor.isInsideBrackets(position(0, 20));
+console.log(isInside); // true
+
+// Listen to bracket events
+editor.on('bracket-matched', ({ match, position }) => {
+  if (match) {
+    console.log(`Bracket at ${position.line}:${position.column} matches with ${match.close.start.line}:${match.close.start.column}`);
+  }
+});
+
+editor.on('auto-close-triggered', ({ openChar, closeChar, position }) => {
+  console.log(`Auto-closed ${openChar}${closeChar} at ${position.line}:${position.column}`);
+});
 ```
 
 ## 📚 Core Concepts
@@ -912,16 +969,16 @@ describe('CodeEditor', () => {
 
 ## 🗺️ Roadmap
 
-- [ ] Code folding support
-- [ ] Minimap support
-- [ ] Multi-threaded tokenization with Web Workers
-- [ ] Incremental parsing for better performance
-- [ ] LSP client integration
-- [ ] Tree-sitter grammar support
-- [ ] Collaborative editing (CRDT)
-- [ ] Virtual scrolling for huge files
+- [x] **Bracket matching and auto-closing** ✅ v1.1.0
 - [ ] Advanced find/replace with regex
-- [ ] Bracket matching and auto-closing
+- [ ] LSP client integration
+- [ ] Virtual scrolling for huge files
+- [ ] Incremental parsing for better performance
+- [ ] Tree-sitter grammar support
+- [ ] Code folding support
+- [ ] Multi-threaded tokenization with Web Workers
+- [ ] Minimap support
+- [ ] Collaborative editing (CRDT)
 
 ## 🤝 Contributing
 

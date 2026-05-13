@@ -9,10 +9,12 @@ import {
     Command,
     LanguageService,
     Disposable,
+    BracketMatch,
 } from '../types/core';
 import { TextDocumentImpl } from './TextDocument';
 import { TypedEventEmitter, CompositeDisposable, DisposableImpl } from './EventSystem';
 import { CommandRegistry, CommandHistory, UndoableCommand, BuiltInCommands } from './CommandSystem';
+import { BracketMatcher, AutoClosingPairsManager } from './BracketMatcher';
 
 /**
  * Default editor options
@@ -46,6 +48,8 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
     private readonly commandRegistry = new CommandRegistry();
     private readonly commandHistory = new CommandHistory(this._options.undoStackSize);
     private readonly languageServices = new Map<string, LanguageService>();
+    private readonly bracketMatcher = new BracketMatcher();
+    private readonly autoClosingPairs = new AutoClosingPairsManager();
     private readonly disposables = new CompositeDisposable();
 
     protected override isDisposed = false;
@@ -177,12 +181,31 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
         this.ensureDocument();
 
         const insertPosition = position || this._selections[0].active;
-        const context = this.createCommandContext();
 
+        // Check if we should skip over a closing character
+        if (text.length === 1 && this.autoClosingPairs.shouldSkipClosing(text, this._document!, insertPosition)) {
+            // Just move cursor past the character
+            const newPosition: Position = {
+                line: insertPosition.line,
+                column: insertPosition.column + 1,
+            };
+            this.setSelections([
+                {
+                    start: newPosition,
+                    end: newPosition,
+                    anchor: newPosition,
+                    active: newPosition,
+                    isReversed: false,
+                },
+            ]);
+            return;
+        }
+
+        const context = this.createCommandContext();
         const command = BuiltInCommands.createInsertTextCommand(context, insertPosition, text);
         this.executeUndoableCommand(command);
 
-        // Update selections
+        // Calculate new position after insertion
         const newPosition: Position = {
             line: insertPosition.line + (text.split('\n').length - 1),
             column: text.includes('\n')
@@ -190,6 +213,45 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
                 : insertPosition.column + text.length,
         };
 
+        // Check for auto-closing pairs (only for single characters)
+        if (text.length === 1) {
+            const shouldAutoClose = this.autoClosingPairs.shouldAutoClose(text);
+
+            if (shouldAutoClose) {
+                const closingChar = this.autoClosingPairs.getClosingChar(text);
+
+                if (closingChar) {
+                    // Insert closing character
+                    const closeCommand = BuiltInCommands.createInsertTextCommand(
+                        context,
+                        newPosition,
+                        closingChar,
+                    );
+                    this.executeUndoableCommand(closeCommand);
+
+                    // Emit auto-close event
+                    this.emit('auto-close-triggered', {
+                        openChar: text,
+                        closeChar: closingChar,
+                        position: insertPosition,
+                    });
+
+                    // Keep cursor between the pair
+                    this.setSelections([
+                        {
+                            start: newPosition,
+                            end: newPosition,
+                            anchor: newPosition,
+                            active: newPosition,
+                            isReversed: false,
+                        },
+                    ]);
+                    return;
+                }
+            }
+        }
+
+        // Normal case - just update selection
         this.setSelections([
             {
                 start: newPosition,
@@ -424,6 +486,36 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
         if (!this._document) {
             throw new Error('No document is open');
         }
+    }
+
+    // ================================
+    // BRACKET MATCHING
+    // ================================
+
+    findMatchingBracket(position: Position): BracketMatch | null {
+        this.ensureNotDisposed();
+        if (!this._document) return null;
+
+        const match = this.bracketMatcher.findMatchingBracket(this._document, position);
+
+        // Emit event for bracket highlighting
+        this.emit('bracket-matched', { match, position });
+
+        return match;
+    }
+
+    findSurroundingBrackets(position: Position): BracketMatch | null {
+        this.ensureNotDisposed();
+        if (!this._document) return null;
+
+        return this.bracketMatcher.findSurroundingBrackets(this._document, position);
+    }
+
+    isInsideBrackets(position: Position): boolean {
+        this.ensureNotDisposed();
+        if (!this._document) return false;
+
+        return this.bracketMatcher.isInsideBrackets(this._document, position);
     }
 
     // ================================

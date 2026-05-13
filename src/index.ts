@@ -43,6 +43,18 @@ export {
 
 export { CodeEditorEngine, createCodeEditor, EditorBuilder, editor } from './core/CodeEditor';
 
+export {
+    BracketMatcher,
+    AutoClosingPairsManager,
+    DEFAULT_BRACKETS,
+    DEFAULT_AUTO_CLOSING_PAIRS,
+} from './core/BracketMatcher';
+
+export type {
+    BracketPair as BracketPairConfig,
+    AutoClosingPair,
+} from './core/BracketMatcher';
+
 // ================================
 // LANGUAGE SERVICES
 // ================================

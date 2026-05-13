@@ -64,6 +64,21 @@ export interface CommandContext {
 }
 
 // ================================
+// BRACKET MATCHING
+// ================================
+
+export interface BracketPair {
+    readonly open: string;
+    readonly close: string;
+}
+
+export interface BracketMatch {
+    readonly open: Range;
+    readonly close: Range;
+    readonly bracketPair: BracketPair;
+}
+
+// ================================
 // EVENT SYSTEM
 // ================================
 
@@ -92,6 +107,8 @@ export interface EditorEvents {
     'document-opened': { document: TextDocument };
     'document-closed': { uri: string };
     'document-saved': { document: TextDocument };
+    'bracket-matched': { match: BracketMatch | null; position: Position };
+    'auto-close-triggered': { openChar: string; closeChar: string; position: Position };
     undo: { command: Command };
     redo: { command: Command };
 }
@@ -343,6 +360,11 @@ export interface CodeEditor extends EventEmitter<EditorEvents> {
     // Configuration
     updateOptions(options: Partial<EditorOptions>): void;
     getOptions(): EditorOptions;
+
+    // Bracket matching
+    findMatchingBracket(position: Position): BracketMatch | null;
+    findSurroundingBrackets(position: Position): BracketMatch | null;
+    isInsideBrackets(position: Position): boolean;
 
     // Utility
     dispose(): void;

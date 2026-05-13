@@ -296,7 +296,13 @@ export const Memory = {
     /**
      * Get memory usage information (Node.js only)
      */
-    getUsage(): NodeJS.MemoryUsage | null {
+    getUsage(): {
+        rss: number;
+        heapTotal: number;
+        heapUsed: number;
+        external: number;
+        arrayBuffers: number;
+    } | null {
         if (typeof process !== 'undefined' && 'memoryUsage' in process && typeof process.memoryUsage === 'function') {
             return process.memoryUsage();
         }

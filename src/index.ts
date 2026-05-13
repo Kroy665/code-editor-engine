@@ -112,7 +112,7 @@ export function createEditor(
         editorOptions: options.editorOptions,
         extensions: options.extensions,
         builtInExtensions: options.builtInExtensions,
-    } as any);
+    });
 
     // Activate language-specific extensions
     if (options.languages) {
@@ -216,7 +216,7 @@ export const Platform = {
      * Check if running in a React Native environment
      */
     isReactNative(): boolean {
-        return typeof navigator !== 'undefined' && (navigator as any).product === 'ReactNative';
+        return typeof navigator !== 'undefined' && 'product' in navigator && (navigator as { product: string }).product === 'ReactNative';
     },
 
     /**
@@ -232,8 +232,11 @@ export const Platform = {
     isNode(): boolean {
         return (
             typeof process !== 'undefined' &&
-            typeof (process as any).versions === 'object' &&
-            typeof (process as any).versions.node === 'string'
+            'versions' in process &&
+            typeof process.versions === 'object' &&
+            process.versions !== null &&
+            'node' in process.versions &&
+            typeof process.versions.node === 'string'
         );
     },
 
@@ -241,7 +244,7 @@ export const Platform = {
      * Check if running in a worker context
      */
     isWorker(): boolean {
-        return typeof (globalThis as any).importScripts === 'function';
+        return typeof globalThis !== 'undefined' && 'importScripts' in globalThis && typeof (globalThis as { importScripts?: unknown }).importScripts === 'function';
     },
 };
 
@@ -293,8 +296,8 @@ export const Memory = {
     /**
      * Get memory usage information (Node.js only)
      */
-    getUsage(): any {
-        if (typeof process !== 'undefined' && process.memoryUsage) {
+    getUsage(): NodeJS.MemoryUsage | null {
+        if (typeof process !== 'undefined' && 'memoryUsage' in process && typeof process.memoryUsage === 'function') {
             return process.memoryUsage();
         }
         return null;

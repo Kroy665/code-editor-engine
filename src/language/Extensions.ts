@@ -137,9 +137,9 @@ export interface ConfigurationContribution {
 
 export interface ConfigurationProperty {
     readonly type: 'string' | 'number' | 'boolean' | 'array' | 'object';
-    readonly default?: any;
+    readonly default?: unknown;
     readonly description: string;
-    readonly enum?: any[];
+    readonly enum?: unknown[];
     readonly enumDescriptions?: string[];
     readonly minimum?: number;
     readonly maximum?: number;
@@ -176,16 +176,16 @@ export interface ViewContainerContribution {
  * Extension state storage
  */
 class ExtensionMemento implements Memento {
-    private storage = new Map<string, any>();
+    private storage = new Map<string, unknown>();
 
     get<T>(key: string): T | undefined;
     get<T>(key: string, defaultValue: T): T;
     get<T>(key: string, defaultValue?: T): T | undefined {
         const value = this.storage.get(key);
-        return value !== undefined ? value : defaultValue;
+        return value !== undefined ? (value as T) : defaultValue;
     }
 
-    async update(key: string, value: any): Promise<void> {
+    async update(key: string, value: unknown): Promise<void> {
         if (value === undefined) {
             this.storage.delete(key);
         } else {
@@ -580,7 +580,7 @@ export interface ExtensionSearchResult {
 export class ExtensibleEditor {
     static create(
         options: {
-            editorOptions?: any;
+            editorOptions?: Partial<import('../types/core').EditorOptions>;
             extensions?: Extension[];
             builtInExtensions?: boolean;
         } = {},

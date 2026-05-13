@@ -252,7 +252,7 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
     // COMMAND SYSTEM
     // ================================
 
-    async executeCommand(commandId: string, ...args: any[]): Promise<any> {
+    async executeCommand(commandId: string, ...args: unknown[]): Promise<unknown> {
         this.ensureNotDisposed();
         return await this.commandRegistry.execute(commandId, ...args);
     }
@@ -366,20 +366,20 @@ export class CodeEditorEngine extends TypedEventEmitter<EditorEvents> implements
         this.disposables.add(
             this.commandRegistry.registerHandler(
                 'editor.insertText',
-                (text: string, position?: Position) => this.insertText(text, position),
+                (text: unknown, position?: unknown) => this.insertText(text as string, position as Position | undefined),
             ),
         );
 
         this.disposables.add(
-            this.commandRegistry.registerHandler('editor.deleteText', (range: Range) =>
-                this.deleteText(range),
+            this.commandRegistry.registerHandler('editor.deleteText', (range: unknown) =>
+                this.deleteText(range as Range),
             ),
         );
 
         this.disposables.add(
             this.commandRegistry.registerHandler(
                 'editor.replaceText',
-                (range: Range, text: string) => this.replaceText(range, text),
+                (range: unknown, text: unknown) => this.replaceText(range as Range, text as string),
             ),
         );
     }

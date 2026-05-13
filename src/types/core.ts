@@ -49,10 +49,10 @@ export interface TextDocument {
 // COMMAND SYSTEM
 // ================================
 
-export interface Command {
+export interface Command<TArgs extends unknown[] = unknown[], TResult = unknown> {
     readonly id: string;
     readonly label: string;
-    execute(...args: any[]): Promise<any> | any;
+    execute(...args: TArgs): Promise<TResult> | TResult;
     undo?(): Promise<void> | void;
     redo?(): Promise<void> | void;
 }
@@ -67,9 +67,9 @@ export interface CommandContext {
 // EVENT SYSTEM
 // ================================
 
-export type EventListener<T = any> = (event: T) => void;
+export type EventListener<T = unknown> = (event: T) => void;
 
-export interface EventEmitter<TEvents = Record<string, any>> {
+export interface EventEmitter<TEvents = Record<string, unknown>> {
     on<K extends keyof TEvents>(event: K, listener: EventListener<TEvents[K]>): Disposable;
     off<K extends keyof TEvents>(event: K, listener: EventListener<TEvents[K]>): void;
     emit<K extends keyof TEvents>(event: K, data: TEvents[K]): void;
@@ -327,7 +327,7 @@ export interface CodeEditor extends EventEmitter<EditorEvents> {
     replaceText(range: Range, text: string): Promise<void>;
 
     // Commands
-    executeCommand(commandId: string, ...args: any[]): Promise<any>;
+    executeCommand(commandId: string, ...args: unknown[]): Promise<unknown>;
     registerCommand(command: Command): Disposable;
 
     // Language services
@@ -376,7 +376,7 @@ export interface ExtensionContext {
 export interface Memento {
     get<T>(key: string): T | undefined;
     get<T>(key: string, defaultValue: T): T;
-    update(key: string, value: any): Promise<void>;
+    update(key: string, value: unknown): Promise<void>;
     keys(): readonly string[];
 }
 
@@ -400,7 +400,7 @@ export interface Configuration {
     get<T>(section: string, defaultValue: T): T;
     has(section: string): boolean;
     inspect<T>(section: string): ConfigurationInspectResult<T> | undefined;
-    update(section: string, value: any, target?: keyof ConfigurationTarget): Promise<void>;
+    update(section: string, value: unknown, target?: keyof ConfigurationTarget): Promise<void>;
 }
 
 export interface ConfigurationInspectResult<T> {

@@ -67,9 +67,9 @@ export class CompositeDisposable implements Disposable {
 /**
  * Typed event emitter implementation with memory management
  */
-export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEmitter<TEvents> {
-    protected listeners = new Map<keyof TEvents, Set<EventListener<any>>>();
-    protected onceListeners = new Map<keyof TEvents, Set<EventListener<any>>>();
+export class TypedEventEmitter<TEvents = Record<string, unknown>> implements EventEmitter<TEvents> {
+    protected listeners = new Map<keyof TEvents, Set<EventListener<TEvents[keyof TEvents]>>>();
+    protected onceListeners = new Map<keyof TEvents, Set<EventListener<TEvents[keyof TEvents]>>>();
     protected isDisposed = false;
 
     on<K extends keyof TEvents>(event: K, listener: EventListener<TEvents[K]>): Disposable {
@@ -81,7 +81,7 @@ export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEm
             this.listeners.set(event, new Set());
         }
 
-        this.listeners.get(event)!.add(listener);
+        (this.listeners.get(event)! as Set<EventListener<TEvents[K]>>).add(listener);
 
         return new DisposableImpl(() => {
             this.off(event, listener);
@@ -89,7 +89,7 @@ export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEm
     }
 
     off<K extends keyof TEvents>(event: K, listener: EventListener<TEvents[K]>): void {
-        const listeners = this.listeners.get(event);
+        const listeners = this.listeners.get(event) as Set<EventListener<TEvents[K]>> | undefined;
         if (listeners) {
             listeners.delete(listener);
             if (listeners.size === 0) {
@@ -97,7 +97,7 @@ export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEm
             }
         }
 
-        const onceListeners = this.onceListeners.get(event);
+        const onceListeners = this.onceListeners.get(event) as Set<EventListener<TEvents[K]>> | undefined;
         if (onceListeners) {
             onceListeners.delete(listener);
             if (onceListeners.size === 0) {
@@ -115,7 +115,7 @@ export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEm
             this.onceListeners.set(event, new Set());
         }
 
-        this.onceListeners.get(event)!.add(listener);
+        (this.onceListeners.get(event)! as Set<EventListener<TEvents[K]>>).add(listener);
 
         return new DisposableImpl(() => {
             this.off(event, listener);
@@ -215,9 +215,9 @@ export class TypedEventEmitter<TEvents = Record<string, any>> implements EventEm
  * Event emitter that supports priorities
  */
 export class PriorityEventEmitter<
-    TEvents = Record<string, any>,
+    TEvents = Record<string, unknown>,
 > extends TypedEventEmitter<TEvents> {
-    private priorityListeners = new Map<keyof TEvents, Map<number, Set<EventListener<any>>>>();
+    private priorityListeners = new Map<keyof TEvents, Map<number, Set<EventListener<TEvents[keyof TEvents]>>>>();
 
     /**
      * Add a listener with priority (higher numbers = higher priority)
@@ -236,7 +236,7 @@ export class PriorityEventEmitter<
             eventPriorities.set(priority, new Set());
         }
 
-        eventPriorities.get(priority)!.add(listener);
+        (eventPriorities.get(priority)! as Set<EventListener<TEvents[K]>>).add(listener);
 
         return new DisposableImpl(() => {
             this.offWithPriority(event, listener, priority);
@@ -251,7 +251,7 @@ export class PriorityEventEmitter<
         const eventPriorities = this.priorityListeners.get(event);
         if (!eventPriorities) return;
 
-        const prioritySet = eventPriorities.get(priority);
+        const prioritySet = eventPriorities.get(priority) as Set<EventListener<TEvents[K]>> | undefined;
         if (!prioritySet) return;
 
         prioritySet.delete(listener);
@@ -306,7 +306,7 @@ export class PriorityEventEmitter<
 /**
  * Async event emitter for handling asynchronous event listeners
  */
-export class AsyncEventEmitter<TEvents = Record<string, any>> extends TypedEventEmitter<TEvents> {
+export class AsyncEventEmitter<TEvents = Record<string, unknown>> extends TypedEventEmitter<TEvents> {
     /**
      * Emit event and wait for all listeners to complete
      */
@@ -322,8 +322,8 @@ export class AsyncEventEmitter<TEvents = Record<string, any>> extends TypedEvent
         if (listeners) {
             for (const listener of [...listeners]) {
                 try {
-                    const result = listener(data) as any;
-                    if (result && typeof result.then === 'function') {
+                    const result = listener(data) as unknown;
+                    if (result && typeof result === 'object' && 'then' in result && typeof result.then === 'function') {
                         promises.push(result as Promise<void>);
                     }
                 } catch (error) {
@@ -337,8 +337,8 @@ export class AsyncEventEmitter<TEvents = Record<string, any>> extends TypedEvent
         if (onceListeners) {
             for (const listener of [...onceListeners]) {
                 try {
-                    const result = listener(data) as any;
-                    if (result && typeof result.then === 'function') {
+                    const result = listener(data) as unknown;
+                    if (result && typeof result === 'object' && 'then' in result && typeof result.then === 'function') {
                         promises.push(result as Promise<void>);
                     }
                 } catch (error) {

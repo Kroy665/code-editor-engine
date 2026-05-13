@@ -1,10 +1,11 @@
-import { Command, CommandContext, Disposable, Position, Range } from '../types/core';
+import { Command, CommandContext, Disposable, Position, Range, EventListener } from '../types/core';
 import { TypedEventEmitter, DisposableImpl } from './EventSystem';
+import { TextDocumentImpl } from './TextDocument';
 
 /**
  * Base implementation for undoable commands
  */
-export abstract class UndoableCommand implements Command {
+export abstract class UndoableCommand<TArgs extends unknown[] = unknown[], TResult = unknown> implements Command<TArgs, TResult> {
     public readonly id: string;
     public readonly label: string;
     protected executed = false;
@@ -15,14 +16,17 @@ export abstract class UndoableCommand implements Command {
         this.label = label;
     }
 
-    abstract execute(...args: any[]): Promise<any> | any;
+    abstract execute(...args: TArgs): Promise<TResult> | TResult;
     abstract undo(): Promise<void> | void;
 
     redo(): Promise<void> | void {
         if (this.undone) {
             this.undone = false;
             this.executed = true;
-            return this.execute();
+            const result = this.execute(...([] as unknown as TArgs));
+            if (result && typeof result === 'object' && 'then' in result) {
+                return result as Promise<void>;
+            }
         }
     }
 
@@ -64,7 +68,7 @@ export class TextEditCommand extends UndoableCommand {
 
     execute(): void {
         const document = this.context.document;
-        const buffer = (document as any).getBuffer();
+        const buffer = (document as TextDocumentImpl).getBuffer();
 
         // Store the text that will be replaced for undo
         this.previousText = buffer.getTextRange(this.range);
@@ -78,7 +82,7 @@ export class TextEditCommand extends UndoableCommand {
         if (!this.executed) return;
 
         const document = this.context.document;
-        const buffer = (document as any).getBuffer();
+        const buffer = (document as TextDocumentImpl).getBuffer();
 
         // Restore the previous text
         buffer.replaceText(this.actualRange, this.previousText);
@@ -136,7 +140,7 @@ export class CompositeCommand extends UndoableCommand {
  */
 export class CommandRegistry {
     private commands = new Map<string, Command>();
-    private handlers = new Map<string, (...args: any[]) => Promise<any> | any>();
+    private handlers = new Map<string, (...args: unknown[]) => Promise<unknown> | unknown>();
 
     /**
      * Register a command
@@ -158,7 +162,7 @@ export class CommandRegistry {
      */
     registerHandler(
         commandId: string,
-        handler: (...args: any[]) => Promise<any> | any,
+        handler: (...args: unknown[]) => Promise<unknown> | unknown,
     ): Disposable {
         if (this.handlers.has(commandId)) {
             throw new Error(`Handler for command '${commandId}' is already registered`);
@@ -174,7 +178,7 @@ export class CommandRegistry {
     /**
      * Execute a command by ID
      */
-    async execute(commandId: string, ...args: any[]): Promise<any> {
+    async execute(commandId: string, ...args: unknown[]): Promise<unknown> {
         // Try handler first
         const handler = this.handlers.get(commandId);
         if (handler) {
@@ -343,9 +347,9 @@ export class CommandHistory {
      */
     on<K extends 'command-executed' | 'command-undone' | 'command-redone' | 'history-changed'>(
         event: K,
-        listener: (data: any) => void,
+        listener: (data: K extends 'history-changed' ? { canUndo: boolean; canRedo: boolean } : { command: UndoableCommand }) => void,
     ): Disposable {
-        return this.events.on(event as any, listener);
+        return this.events.on(event, listener as EventListener<unknown>);
     }
 }
 
@@ -407,7 +411,7 @@ export class CommandGrouper {
 
         this.groupTimeout = setTimeout(() => {
             this.endGroup();
-        }, this.groupingTimeoutMs) as any;
+        }, this.groupingTimeoutMs) as unknown as number;
     }
 }
 
